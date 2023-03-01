@@ -27,16 +27,19 @@ func NewAuthWeb(userClient client.UserClient, embed embed.FS) *authWeb {
 }
 
 func (a *authWeb) Login(w http.ResponseWriter, r *http.Request) {
-	header := path.Join("views/general/header.html")
-	templateLogin := path.Join("views/auth/login.html")
+	// header := path.Join("views/general/header.html")
+	header := path.Join("views", "general", "header.html")
+	// templateLogin := path.Join("views/auth/login.html")
+	templateLogin := path.Join("views", "auth", "login.html")
 
-	var tmpl, err = template.ParseFS(a.embed, templateLogin, header)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	// var tmpl, err = template.ParseFS(a.embed, templateLogin, header)
+	var tmpl = template.Must(template.ParseFiles(templateLogin, header))
+	// if err != nil {
+	// 	http.Error(w, err.Error(), http.StatusInternalServerError)
+	// 	return
+	// }
 
-	err = tmpl.Execute(w, nil)
+	err := tmpl.Execute(w, NewAuthWeb(a.userClient, a.embed))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -70,16 +73,20 @@ func (a *authWeb) LoginProcess(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *authWeb) Register(w http.ResponseWriter, r *http.Request) {
-	regis := path.Join("views/auth/register.html")
-	header := path.Join("views/general/header.html")
+	// regis := path.Join("views/auth/register.html")
+	regis := path.Join("views", "auth", "register.html")
+	// header := path.Join("views/general/header.html")
+	header := path.Join("views", "general", "header.html")
 
-	tmpl, err := template.ParseFS(a.embed, regis, header)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	// tmpl, err := template.ParseFS(a.embed, regis, header)
+	// if err != nil {
+	// 	http.Error(w, err.Error(), http.StatusInternalServerError)
+	// 	return
+	// }
 
-	err = tmpl.Execute(w, nil)
+	var tmpl = template.Must(template.ParseFiles(regis, header))
+
+	err := tmpl.Execute(w, NewAuthWeb(a.userClient, a.embed))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

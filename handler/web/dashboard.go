@@ -107,7 +107,8 @@ func (d *dashboardWeb) Dashboard(w http.ResponseWriter, r *http.Request) {
 	// tmpl := template.Must(template.ParseFS(d.embed, dashboard, header)).Funcs(funcMap)
 
 	// tmpl := template.Must(template.New("dashboard.html").Funcs(funcMap).ParseFS(d.embed, dashboard, header))
-	tmpl, err := template.New("dashboard.html").Funcs(funcMap).ParseFS(d.embed, dashboard, header)
+	// tmpl, err := template.New("dashboard.html").Funcs(funcMap).ParseFS(d.embed, dashboard, header)
+	tmpl, err := template.New("dashboard.html").Funcs(funcMap).ParseFiles(dashboard, header)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

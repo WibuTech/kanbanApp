@@ -42,7 +42,8 @@ func (a *modifyWeb) AddTask(w http.ResponseWriter, r *http.Request) {
 	addTask := path.Join("views/main/add-task.html")
 	header := path.Join("views/general/header.html")
 
-	tmpl, err := template.ParseFS(a.embed, addTask, header)
+	// tmpl, err := template.ParseFS(a.embed, addTask, header)
+	tmpl, err := template.New("add-task.html").ParseFiles(addTask, header)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -92,7 +93,9 @@ func (a *modifyWeb) AddCategory(w http.ResponseWriter, r *http.Request) {
 	categoryAdd := path.Join("views/main/add-category.html")
 	header := path.Join("views/general/header.html")
 
-	tmpl, err := template.ParseFS(a.embed, categoryAdd, header)
+	// tmpl, err := template.ParseFS(a.embed, categoryAdd, header)
+	tmpl, err := template.New("add-category.html").ParseFiles(categoryAdd, header)
+
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -148,7 +151,9 @@ func (a *modifyWeb) UpdateTask(w http.ResponseWriter, r *http.Request) {
 	header := path.Join("views/general/header.html")
 	updateTask := path.Join("views/main/update-task.html")
 
-	tmpl, err := template.ParseFS(a.embed, updateTask, header)
+	// tmpl, err := template.ParseFS(a.embed, updateTask, header)
+	tmpl, err := template.New("update-task.html").ParseFiles(updateTask, header)
+
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
