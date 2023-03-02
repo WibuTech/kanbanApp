@@ -5,17 +5,29 @@ import (
 	"os"
 
 	"gorm.io/driver/postgres"
+	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+)
+
+var (
+	USE_SQLITE = true
 )
 
 var db *gorm.DB
 
 func ConnectDB() error {
 	// connect using gorm pgx
-	conn, err := gorm.Open(postgres.New(postgres.Config{
-		DriverName: "pgx",
-		DSN:        os.Getenv("DATABASE_URL"),
-	}), &gorm.Config{})
+	var dialect gorm.Dialector
+	if USE_SQLITE {
+		dialect = sqlite.Open("local.db")
+	} else {
+		dialect = postgres.New(postgres.Config{
+			DriverName: "pgx",
+			DSN:        os.Getenv("DATABASE_URL"),
+		})
+	}
+
+	conn, err := gorm.Open(dialect, &gorm.Config{})
 	if err != nil {
 		return err
 	}

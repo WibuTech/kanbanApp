@@ -3,10 +3,12 @@ package main
 import (
 	"embed"
 	"fmt"
+	"io/fs"
 	"kanbanApp/client"
 	"kanbanApp/handler/api"
 	"kanbanApp/handler/web"
 	"kanbanApp/middleware"
+	"kanbanApp/public"
 	"kanbanApp/repository"
 	"kanbanApp/service"
 	"kanbanApp/utils"
@@ -64,6 +66,28 @@ func main() {
 	wg.Wait()
 }
 
+// Protect FS from directory listing.
+type protectedFS struct {
+	p http.FileSystem
+}
+
+var _ http.FileSystem = (*protectedFS)(nil)
+
+func (e *protectedFS) Open(name string) (f http.File, err error) {
+	f, err = e.p.Open(name)
+	if err != nil {
+		return nil, err
+	}
+	stat, err := f.Stat()
+	if err != nil {
+		return nil, err
+	}
+	if stat.IsDir() {
+		return nil, fs.ErrNotExist
+	}
+	return
+}
+
 func RunServer(db *gorm.DB, mux *http.ServeMux) *http.ServeMux {
 	userRepo := repository.NewUserRepository(db)
 	taskRepo := repository.NewTaskRepository(db)
@@ -82,6 +106,9 @@ func RunServer(db *gorm.DB, mux *http.ServeMux) *http.ServeMux {
 		TaskAPIHandler:     taskAPIHandler,
 		CategoryAPIHandler: categoryAPIHandler,
 	}
+
+	// serve assets.
+	mux.Handle("/assets/", http.FileServer(&protectedFS{http.FS(public.AssetsDir)}))
 
 	MuxRoute(mux, "POST", "/api/v1/users/login", middleware.Post(http.HandlerFunc(apiHandler.UserAPIHandler.Login)))
 	MuxRoute(mux, "POST", "/api/v1/users/register", middleware.Post(http.HandlerFunc(apiHandler.UserAPIHandler.Register)))
